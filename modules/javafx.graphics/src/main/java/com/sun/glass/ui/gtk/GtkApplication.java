@@ -259,23 +259,20 @@ final class GtkApplication extends Application implements
 
         final boolean disableGrab = AccessController.doPrivileged((PrivilegedAction<Boolean>) () -> Boolean.getBoolean("sun.awt.disablegrab") ||
                Boolean.getBoolean("glass.disableGrab"));
-        
-	int windowScale = getWindowScale();
+
+        int windowScale = getWindowScale();
 
         _init(eventProc, disableGrab, windowScale);
     }
 
     private int getWindowScale() {
         String type = AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty("com.sun.javafx.application.type", ""));
-    	if ("FXCanvas".equals(type)) {
+        if ("FXCanvas".equals(type)) {
             PlatformLogger logger = Logging.getJavaFXLogger();
             final int scale = AccessController.doPrivileged((PrivilegedAction<Integer>) () -> Integer.getInteger("org.eclipse.swt.internal.deviceZoom", 100));
-            logger.warning("scale=" + scale);
-            System.out.println("====== SCALE " + scale);
             return scale / 100;
-    	}
-        System.out.println("====== SCALE FAILURE ===== ");
-    	return 1;
+        }
+        return 1;
     }
 
     @Override
