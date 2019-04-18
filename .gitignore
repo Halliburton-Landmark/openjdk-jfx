@@ -1,0 +1,12 @@
+build/
+buildSrc/build/
+
+.gradle/
+.build
+.buildSrc
+
+.hg
+.hgtags
+.hgignore
+
+

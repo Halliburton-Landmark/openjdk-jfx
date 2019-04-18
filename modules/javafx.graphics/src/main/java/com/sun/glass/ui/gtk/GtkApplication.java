@@ -53,8 +53,8 @@ import java.lang.annotation.Native;
 
 final class GtkApplication extends Application implements
                                     InvokeLaterDispatcher.InvokeLaterSubmitter {
-    private static final String SWT_INTERNAL_CLASS =
-            "org.eclipse.swt.internal.gtk.OS";
+    private static final String SWT_INTERNAL_CLASS_OS = "org.eclipse.swt.internal.gtk.OS";
+    private static final String SWT_INTERNAL_CLASS_GTK = "org.eclipse.swt.internal.gtk.GTK";
     private static final int forcedGtkVersion;
 
 
@@ -63,11 +63,19 @@ final class GtkApplication extends Application implements
         Class<?> OS = AccessController.
                 doPrivileged((PrivilegedAction<Class<?>>) () -> {
                     try {
-                        return Class.forName(SWT_INTERNAL_CLASS, true,
+                        return Class.forName(SWT_INTERNAL_CLASS_GTK, true,
                                 ClassLoader.getSystemClassLoader());
                     } catch (Exception e) {}
                     try {
-                        return Class.forName(SWT_INTERNAL_CLASS, true,
+                        return Class.forName(SWT_INTERNAL_CLASS_GTK, true,
+                                Thread.currentThread().getContextClassLoader());
+                    } catch (Exception e) {}
+                    try {
+                        return Class.forName(SWT_INTERNAL_CLASS_OS, true,
+                                ClassLoader.getSystemClassLoader());
+                    } catch (Exception e) {}
+                    try {
+                        return Class.forName(SWT_INTERNAL_CLASS_OS, true,
                                 Thread.currentThread().getContextClassLoader());
                     } catch (Exception e) {}
                     return null;
@@ -252,7 +260,19 @@ final class GtkApplication extends Application implements
         final boolean disableGrab = AccessController.doPrivileged((PrivilegedAction<Boolean>) () -> Boolean.getBoolean("sun.awt.disablegrab") ||
                Boolean.getBoolean("glass.disableGrab"));
 
-        _init(eventProc, disableGrab);
+        int windowScale = getWindowScale();
+
+        _init(eventProc, disableGrab, windowScale);
+    }
+
+    private int getWindowScale() {
+        String type = AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getProperty("com.sun.javafx.application.type", ""));
+        if ("FXCanvas".equals(type)) {
+            PlatformLogger logger = Logging.getJavaFXLogger();
+            final int scale = AccessController.doPrivileged((PrivilegedAction<Integer>) () -> Integer.getInteger("org.eclipse.swt.internal.deviceZoom", 100));
+            return scale / 100;
+        }
+        return 1;
     }
 
     @Override
@@ -296,7 +316,7 @@ final class GtkApplication extends Application implements
 
     private native void _terminateLoop();
 
-    private native void _init(long eventProc, boolean disableGrab);
+    private native void _init(long eventProc, boolean disableGrab, int windowScale);
 
     private native void _runLoop(Runnable launchable, boolean noErrorTrap);
 
