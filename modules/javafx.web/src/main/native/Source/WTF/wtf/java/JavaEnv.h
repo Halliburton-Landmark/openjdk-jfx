@@ -98,6 +98,7 @@ struct EntryJavaLogger
     }
 };
 
+extern JGClass comSunWebkitFileSystem;
 
 } // namespace WebCore
 

@@ -35,25 +35,18 @@ namespace WebCore {
 
 namespace FileSystem {
 
-static jclass GetFileSystemClass(JNIEnv* env)
-{
-    static JGClass clazz(env->FindClass("com/sun/webkit/FileSystem"));
-    ASSERT(clazz);
-    return clazz;
-}
-
 bool fileExists(const String& path)
 {
     JNIEnv* env = WebCore_GetJavaEnv();
 
     static jmethodID mid = env->GetStaticMethodID(
-            GetFileSystemClass(env),
+            comSunWebkitFileSystem,
             "fwkFileExists",
             "(Ljava/lang/String;)Z");
     ASSERT(mid);
 
     jboolean result = env->CallStaticBooleanMethod(
-            GetFileSystemClass(env),
+            comSunWebkitFileSystem,
             mid,
             (jstring)path.toJavaString(env));
     CheckAndClearException(env);
@@ -78,13 +71,13 @@ bool getFileSize(const String& path, long long& result)
     JNIEnv* env = WebCore_GetJavaEnv();
 
     static jmethodID mid = env->GetStaticMethodID(
-            GetFileSystemClass(env),
+            comSunWebkitFileSystem,
             "fwkGetFileSize",
             "(Ljava/lang/String;)J");
     ASSERT(mid);
 
     jlong size = env->CallStaticLongMethod(
-            GetFileSystemClass(env),
+            comSunWebkitFileSystem,
             mid,
             (jstring) path.toJavaString(env));
     CheckAndClearException(env);
@@ -130,13 +123,13 @@ String pathByAppendingComponent(const String& path, const String& component)
     JNIEnv* env = WebCore_GetJavaEnv();
 
     static jmethodID mid = env->GetStaticMethodID(
-            GetFileSystemClass(env),
+            comSunWebkitFileSystem,
             "fwkPathByAppendingComponent",
             "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;");
     ASSERT(mid);
 
     JLString result = static_cast<jstring>(env->CallStaticObjectMethod(
-            GetFileSystemClass(env),
+            comSunWebkitFileSystem,
             mid,
             (jstring)path.toJavaString(env),
             (jstring)component.toJavaString(env)));
@@ -150,13 +143,13 @@ bool makeAllDirectories(const String& path)
     JNIEnv* env = WebCore_GetJavaEnv();
 
     static jmethodID mid = env->GetStaticMethodID(
-            GetFileSystemClass(env),
+            comSunWebkitFileSystem,
             "fwkMakeAllDirectories",
             "(Ljava/lang/String;)Z");
     ASSERT(mid);
 
     jboolean result = env->CallStaticBooleanMethod(
-            GetFileSystemClass(env),
+            comSunWebkitFileSystem,
             mid,
             (jstring)path.toJavaString(env));
     CheckAndClearException(env);
@@ -181,7 +174,7 @@ std::optional<FileMetadata> fileMetadata(const String& path)
     JNIEnv* env = WebCore_GetJavaEnv();
 
     static jmethodID mid = env->GetStaticMethodID(
-            GetFileSystemClass(env),
+            comSunWebkitFileSystem,
             "fwkGetFileMetadata",
             "(Ljava/lang/String;[J)Z");
     ASSERT(mid);
@@ -189,7 +182,7 @@ std::optional<FileMetadata> fileMetadata(const String& path)
     JLocalRef<jlongArray> lArray(env->NewLongArray(3));
 
     jboolean result = env->CallStaticBooleanMethod(
-            GetFileSystemClass(env),
+            comSunWebkitFileSystem,
             mid,
             (jstring)path.toJavaString(env), (jlongArray)lArray);
     CheckAndClearException(env);
@@ -260,13 +253,13 @@ String pathGetFileName(const String& path)
     JNIEnv* env = WebCore_GetJavaEnv();
 
     static jmethodID mid = env->GetStaticMethodID(
-            GetFileSystemClass(env),
+            /comSunWebkitFileSystem,
             "fwkPathGetFileName",
             "(Ljava/lang/String;)Ljava/lang/String;");
     ASSERT(mid);
 
     JLString result = static_cast<jstring>(env->CallStaticObjectMethod(
-            GetFileSystemClass(env),
+            comSunWebkitFileSystem,
             mid,
             (jstring) path.toJavaString(env)));
     CheckAndClearException(env);

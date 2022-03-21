@@ -42,6 +42,8 @@ bool CheckAndClearException(JNIEnv* env)
 
 namespace WebCore {
 
+JGClass comSunWebkitFileSystem;
+
 jclass PG_GetGraphicsManagerClass(JNIEnv* env)
 {
     static JGClass graphicsManagerCls(
@@ -285,6 +287,21 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*)
     _CrtSetDbgFlag( tmpFlag );
 #endif
     jvm = vm;
+
+    JNIEnv* env = WebCore_GetJavaEnv();
+
+    // Class com.sun.webkit.FileSystem is accessed from a newly created native
+    // thread from FileSystemJava. The class is resolved at initialization time
+    // as in the JNI_OnLoad callback the classloader used to load the native
+    // library is also used to load the target class, which is by construction
+    // the right one
+    static jclass fileSystemClass = env->FindClass("com/sun/webkit/FileSystem");
+
+    ASSERT(fileSystemClass);
+
+    static JGClass fileSystemRef(fileSystemClass);
+    WebCore::comSunWebkitFileSystem = fileSystemRef;
+
     return JNI_VERSION_1_2;
 }
 
